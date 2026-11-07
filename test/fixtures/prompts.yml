@@ -1,0 +1,14 @@
+public_prompt:
+  user: ada
+  category: development
+  title: Revisor de código
+  description: Revisa código y prioriza riesgos.
+  content: Revisa este código y presenta los problemas por prioridad.
+  ai_model: GPT-5
+  visibility: 0
+
+private_prompt:
+  user: grace
+  title: Idea privada
+  content: Este contenido es privado.
+  visibility: 1

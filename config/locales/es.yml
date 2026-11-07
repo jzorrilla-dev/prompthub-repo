@@ -1,0 +1,34 @@
+es:
+  time:
+    formats:
+      short: "%d %b, %H:%M"
+      long: "%d de %B de %Y, %H:%M"
+  date:
+    month_names: [~, enero, febrero, marzo, abril, mayo, junio, julio, agosto, septiembre, octubre, noviembre, diciembre]
+    abbr_month_names: [~, ene, feb, mar, abr, may, jun, jul, ago, sep, oct, nov, dic]
+  activerecord:
+    models:
+      user: "usuario"
+      prompt: "prompt"
+    attributes:
+      user:
+        name: "Nombre"
+        email_address: "Correo electrónico"
+        password: "Contraseña"
+        password_confirmation: "Confirmación de contraseña"
+      prompt:
+        title: "Título"
+        description: "Descripción"
+        content: "Contenido"
+        ai_model: "Modelo"
+    errors:
+      messages:
+        record_invalid: "La validación falló: %{errors}"
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      blank: "no puede estar vacío"
+      taken: "ya está en uso"
+      invalid: "no es válido"
+      too_long: "es demasiado largo"
+      confirmation: "no coincide"

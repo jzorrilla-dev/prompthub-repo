@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full scroll-smooth">
+  <head>
+    <title><%= page_title(content_for(:title)) %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="PromptHub: descubre, versiona y comparte prompts que funcionan.">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-full bg-stone-50 text-slate-950 antialiased">
+    <header class="sticky top-0 z-40 border-b border-slate-200/80 bg-stone-50/90 backdrop-blur-xl">
+      <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8" aria-label="Navegación principal">
+        <%= link_to root_path, class: "group flex items-center gap-3" do %>
+          <span class="grid size-9 place-items-center rounded-xl bg-indigo-600 text-sm font-black text-white shadow-sm shadow-indigo-200 transition group-hover:-rotate-3">P</span>
+          <span class="text-lg font-bold tracking-tight">Prompt<span class="text-indigo-600">Hub</span></span>
+        <% end %>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+          <%= link_to "Explorar", prompts_path, class: "hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white hover:text-slate-950 sm:block" %>
+          <% if authenticated? %>
+            <%= link_to "Mis prompts", prompts_path(mine: 1), class: "hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white hover:text-slate-950 md:block" %>
+            <%= link_to "+ Nuevo prompt", new_prompt_path, class: "rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-indigo-700" %>
+            <%= button_to "Salir", session_path, method: :delete, class: "hidden px-2 py-2 text-sm font-semibold text-slate-500 hover:text-slate-950 sm:block" %>
+          <% else %>
+            <%= link_to "Ingresar", new_session_path, class: "rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-white" %>
+            <%= link_to "Crear cuenta", new_registration_path, class: "rounded-xl bg-slate-950 px-4 py-2 text-sm font-bold text-white hover:bg-indigo-600" %>
+          <% end %>
+        </div>
+      </nav>
+    </header>
+
+    <% if flash.any? %>
+      <div class="fixed right-4 top-20 z-50 w-[min(24rem,calc(100%-2rem))] space-y-2">
+        <% flash.each do |type, message| %>
+          <div class="rounded-xl border px-4 py-3 text-sm font-medium shadow-lg <%= type.to_s == "alert" ? "border-rose-200 bg-rose-50 text-rose-800" : "border-emerald-200 bg-emerald-50 text-emerald-800" %>">
+            <%= message %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <main><%= yield %></main>
+
+    <footer class="border-t border-slate-200 bg-white">
+      <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <p>PromptHub · Las buenas ideas merecen historial.</p>
+        <p>Construido con Rails, Hotwire y curiosidad.</p>
+      </div>
+    </footer>
+  </body>
+</html>

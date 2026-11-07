@@ -1,0 +1,55 @@
+<%= form_with model: prompt, class: "space-y-8" do |form| %>
+  <%= render "shared/errors", object: prompt %>
+
+  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <div class="mb-6"><p class="text-sm font-bold text-indigo-600">01 · Identidad</p><h2 class="mt-1 text-xl font-black">¿Qué resuelve este prompt?</h2></div>
+    <div class="space-y-5">
+      <div><%= form.label :title, "Título", class: "form-label" %><%= form.text_field :title, required: true, maxlength: 140, placeholder: "Ej. Revisor técnico que prioriza riesgos", class: "form-input" %></div>
+      <div><%= form.label :description, "Descripción", class: "form-label" %><%= form.text_area :description, rows: 3, maxlength: 500, placeholder: "Explica cuándo usarlo y qué resultado puedes esperar.", class: "form-input" %></div>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div><%= form.label :category_id, "Categoría", class: "form-label" %><%= form.collection_select :category_id, @categories, :id, :name, { include_blank: "Sin categoría" }, class: "form-input" %></div>
+        <div><%= form.label :ai_model, "Modelo probado", class: "form-label" %><%= form.text_field :ai_model, placeholder: "Ej. GPT-5, Claude…", class: "form-input" %></div>
+      </div>
+      <div><%= form.label :tag_list, "Etiquetas", class: "form-label" %><%= form.text_field :tag_list, value: prompt.tag_list, placeholder: "rails, revisión, arquitectura", class: "form-input" %><p class="mt-1.5 text-xs text-slate-400">Sepáralas con comas.</p></div>
+    </div>
+  </section>
+
+  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <div class="mb-6"><p class="text-sm font-bold text-indigo-600">02 · Prompt</p><h2 class="mt-1 text-xl font-black">El artefacto que quieres conservar</h2></div>
+    <%= form.label :content, "Contenido", class: "form-label" %>
+    <%= form.text_area :content, required: true, rows: 16, placeholder: "Escribe el prompt completo. Puedes usar Markdown, variables como {{tema}} y secciones…", class: "form-input font-mono text-sm leading-7" %>
+  </section>
+
+  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" data-controller="nested-form">
+    <div class="mb-6 flex items-start justify-between gap-4"><div><p class="text-sm font-bold text-indigo-600">03 · Evidencia</p><h2 class="mt-1 text-xl font-black">Resultados obtenidos</h2></div><button type="button" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold hover:bg-slate-50" data-action="nested-form#add">+ Resultado</button></div>
+    <div class="space-y-5" data-nested-form-target="container">
+      <%= form.fields_for :prompt_results do |result_form| %>
+        <div class="result-fields rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div class="mb-3 flex items-center justify-between"><span class="text-xs font-bold uppercase tracking-wider text-slate-500">Ejemplo de salida</span><label class="text-xs font-semibold text-rose-600"><%= result_form.check_box :_destroy %> Eliminar</label></div>
+          <%= result_form.text_field :label, placeholder: "Etiqueta opcional: Resultado final", class: "form-input !mt-0 mb-3" %>
+          <%= result_form.text_area :content, rows: 5, placeholder: "Pega aquí el resultado producido…", class: "form-input !mt-0 font-mono text-sm" %>
+        </div>
+      <% end %>
+    </div>
+    <template data-nested-form-target="template">
+      <div class="result-fields rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <div class="mb-3 flex items-center justify-between"><span class="text-xs font-bold uppercase tracking-wider text-slate-500">Nuevo resultado</span><button type="button" class="text-xs font-semibold text-rose-600" data-action="nested-form#remove">Quitar</button></div>
+        <input class="form-input !mt-0 mb-3" placeholder="Etiqueta opcional" type="text" name="prompt[prompt_results_attributes][NEW_RECORD][label]">
+        <textarea class="form-input !mt-0 font-mono text-sm" rows="5" placeholder="Pega aquí el resultado producido…" name="prompt[prompt_results_attributes][NEW_RECORD][content]"></textarea>
+      </div>
+    </template>
+  </section>
+
+  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <div class="mb-6"><p class="text-sm font-bold text-indigo-600">04 · Publicación</p><h2 class="mt-1 text-xl font-black">Control y contexto</h2></div>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div><%= form.label :visibility, "Visibilidad", class: "form-label" %><%= form.select :visibility, [["Público — visible para todos", "public_prompt"], ["Privado — solo para mí", "private_prompt"]], {}, class: "form-input" %></div>
+      <% if prompt.persisted? %><div><%= form.label :change_note, "Nota de esta versión", class: "form-label" %><%= form.text_field :change_note, placeholder: "Qué cambió y por qué", class: "form-input" %></div><% end %>
+    </div>
+  </section>
+
+  <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+    <%= link_to "Cancelar", prompt.persisted? ? prompt : prompts_path, class: "rounded-xl border border-slate-300 bg-white px-6 py-3 text-center font-bold text-slate-700 hover:bg-slate-50" %>
+    <%= form.submit prompt.persisted? ? "Guardar nueva versión" : "Publicar prompt", class: "btn-primary cursor-pointer" %>
+  </div>
+<% end %>

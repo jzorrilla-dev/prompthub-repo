@@ -1,0 +1,15 @@
+<% if @total_pages > 1 %>
+  <nav class="mt-10 flex items-center justify-between border-t border-slate-200 pt-5" aria-label="Paginación">
+    <% if @page > 1 %>
+      <%= link_to "← Anterior", pagination_path(@page - 1), class: "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50" %>
+    <% else %>
+      <span></span>
+    <% end %>
+    <span class="text-sm text-slate-500">Página <strong class="text-slate-900"><%= @page %></strong> de <%= @total_pages %></span>
+    <% if @page < @total_pages %>
+      <%= link_to "Siguiente →", pagination_path(@page + 1), class: "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50" %>
+    <% else %>
+      <span></span>
+    <% end %>
+  </nav>
+<% end %>

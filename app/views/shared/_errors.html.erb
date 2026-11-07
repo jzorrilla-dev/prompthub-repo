@@ -1,0 +1,10 @@
+<% if object.errors.any? %>
+  <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-900">
+    <p class="font-bold">Revisa estos datos:</p>
+    <ul class="mt-2 list-disc space-y-1 pl-5 text-sm">
+      <% object.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

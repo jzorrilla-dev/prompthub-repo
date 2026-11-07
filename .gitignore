@@ -1,0 +1,17 @@
+/.bundle
+/.gems
+/.cache
+/config/master.key
+/config/credentials/*.key
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+!/tmp/pids
+!/tmp/pids/.keep
+/storage/*
+!/storage/.keep
+/public/assets
+/app/assets/builds/*
+!/app/assets/builds/.keep
+.env

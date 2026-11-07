@@ -1,0 +1,17 @@
+import { Controller } from "@hotwired/stimulus"
+
+export default class extends Controller {
+  static targets = ["source", "button"]
+
+  async copy() {
+    await navigator.clipboard.writeText(this.sourceTarget.textContent)
+    const original = this.buttonTarget.textContent
+    this.buttonTarget.textContent = "¡Copiado!"
+    this.buttonTarget.classList.add("!bg-emerald-600")
+
+    setTimeout(() => {
+      this.buttonTarget.textContent = original
+      this.buttonTarget.classList.remove("!bg-emerald-600")
+    }, 1800)
+  }
+}
