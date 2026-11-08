@@ -1,0 +1,9 @@
+<div id="comment_form">
+  <%= form_with model: [prompt, comment], class: "space-y-3" do |form| %>
+    <% if comment.errors.any? %>
+      <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"><%= comment.errors.full_messages.to_sentence %></div>
+    <% end %>
+    <%= form.text_area :body, rows: 4, maxlength: 2_000, required: true, placeholder: "Comparte una observación, una mejora o el contexto que te resultó útil…", class: "form-input !mt-0 text-sm leading-6" %>
+    <div class="flex items-center justify-between gap-3"><span class="text-xs text-slate-400">Máximo 2.000 caracteres</span><%= form.submit comment.persisted? ? "Guardar cambios" : "Comentar", class: "btn-primary cursor-pointer" %></div>
+  <% end %>
+</div>

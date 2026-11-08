@@ -1,0 +1,3 @@
+ada_public_prompt:
+  user: ada
+  prompt: public_prompt

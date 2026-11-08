@@ -13,8 +13,8 @@
     <% end %>
   </div>
   <div class="mt-5 flex items-center gap-2 border-t border-slate-100 pt-4">
-    <span class="grid size-7 place-items-center rounded-full bg-amber-100 text-[10px] font-black text-amber-800"><%= initials(prompt.user.name) %></span>
-    <span class="text-xs font-semibold text-slate-600"><%= prompt.user.name %></span>
+    <%= link_to user_path(prompt.user), aria: { label: "Ver perfil de #{prompt.user.name}" }, class: "grid size-7 place-items-center rounded-full bg-amber-100 text-[10px] font-black text-amber-800 hover:ring-2 hover:ring-amber-200" do %><%= initials(prompt.user.name) %><% end %>
+    <%= link_to prompt.user.name, user_path(prompt.user), class: "text-xs font-semibold text-slate-600 hover:text-indigo-700" %>
     <% if prompt.ai_model.present? %>
       <span class="ml-auto text-xs text-slate-400"><%= prompt.ai_model %></span>
     <% end %>

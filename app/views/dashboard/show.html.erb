@@ -1,0 +1,27 @@
+<% content_for :title, "Panel" %>
+
+<section class="border-b border-slate-200 bg-white">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      <div><p class="text-sm font-bold uppercase tracking-widest text-indigo-600">Tu espacio de trabajo</p><h1 class="mt-2 text-4xl font-black tracking-tight">Hola, <%= current_user.name.split.first %>.</h1><p class="mt-3 text-slate-500">Un resumen de las ideas que estás construyendo.</p></div>
+      <%= link_to "+ Crear prompt", new_prompt_path, class: "btn-primary text-center" %>
+    </div>
+  </div>
+</section>
+
+<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+  <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Estadísticas de tu cuenta">
+    <% [["Prompts", @stats[:prompts], "Total creado", "text-indigo-600"], ["Públicos", @stats[:public_prompts], "Compartidos", "text-emerald-600"], ["Favoritos", @stats[:favorites], "Guardados", "text-amber-600"], ["Comentarios", @stats[:comments], "Aportes", "text-rose-600"]].each do |label, value, caption, color_class| %>
+      <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-slate-500"><%= label %></p><p class="mt-3 text-3xl font-black text-slate-950"><%= value %></p><p class="mt-1 text-xs font-medium <%= color_class %>"><%= caption %></p></div>
+    <% end %>
+  </section>
+
+  <div class="mt-10 grid gap-8 lg:grid-cols-[1.2fr_.8fr]">
+    <div class="space-y-8">
+      <section aria-labelledby="my-prompts-heading"><div class="mb-4 flex items-center justify-between"><h2 id="my-prompts-heading" class="text-2xl font-black tracking-tight">Mis prompts</h2><%= link_to "Ver todos →", prompts_path(mine: 1), class: "text-sm font-bold text-indigo-700" %></div><% if @my_prompts.any? %><div class="grid gap-4 sm:grid-cols-2"><%= render partial: "shared/prompt_card", collection: @my_prompts, as: :prompt %></div><% else %><div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-sm text-slate-500">Todavía no creaste prompts. <%= link_to "Crea el primero", new_prompt_path, class: "font-bold text-indigo-700" %></div><% end %></section>
+      <section aria-labelledby="saved-prompts-heading"><div class="mb-4 flex items-center justify-between"><h2 id="saved-prompts-heading" class="text-2xl font-black tracking-tight">Guardados recientemente</h2><%= link_to "Ver favoritos →", favorites_path, class: "text-sm font-bold text-indigo-700" %></div><% if @favorite_prompts.any? %><div class="grid gap-4 sm:grid-cols-2"><%= render partial: "shared/prompt_card", collection: @favorite_prompts, as: :prompt %></div><% else %><div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-sm text-slate-500">Tus favoritos aparecerán aquí cuando guardes prompts de la comunidad.</div><% end %></section>
+    </div>
+
+    <aside aria-labelledby="activity-heading"><div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h2 id="activity-heading" class="text-xl font-black">Actividad reciente</h2><ol class="mt-5 space-y-5"><% if @activity.any? %><% @activity.each do |entry| %><li class="flex gap-3"><span class="grid size-8 shrink-0 place-items-center rounded-full <%= { "prompt" => "bg-indigo-100 text-indigo-700", "comment" => "bg-rose-100 text-rose-700", "favorite" => "bg-amber-100 text-amber-700" }.fetch(entry[:kind]) %>"><%= { "prompt" => "✦", "comment" => "☷", "favorite" => "★" }.fetch(entry[:kind]) %></span><div class="min-w-0 text-sm"><% if entry[:kind] == "prompt" %><p>Actualizaste <%= link_to entry[:subject].title, entry[:subject], class: "font-bold text-slate-800 hover:text-indigo-700" %></p><% elsif entry[:kind] == "comment" %><p>Comentaste en <%= link_to entry[:subject].prompt.title, entry[:subject].prompt, class: "font-bold text-slate-800 hover:text-indigo-700" %></p><% else %><p>Guardaste <%= link_to entry[:subject].prompt.title, entry[:subject].prompt, class: "font-bold text-slate-800 hover:text-indigo-700" %></p><% end %><time class="mt-1 block text-xs text-slate-400"><%= time_ago_in_words(entry[:occurred_at]) %></time></div></li><% end %><% else %><li class="text-sm text-slate-500">Tu actividad aparecerá aquí a medida que uses PromptHub.</li><% end %></ol></div></aside>
+  </div>
+</div>

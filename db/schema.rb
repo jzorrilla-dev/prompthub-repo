@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_07_000200) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_000500) do
   create_table "categories", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -18,6 +18,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_000200) do
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_categories_on_name", unique: true
     t.index ["slug"], name: "index_categories_on_slug", unique: true
+  end
+
+  create_table "comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "prompt_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["prompt_id", "created_at"], name: "index_comments_on_prompt_id_and_created_at"
+    t.index ["prompt_id"], name: "index_comments_on_prompt_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "favorites", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "prompt_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["prompt_id"], name: "index_favorites_on_prompt_id"
+    t.index ["user_id", "prompt_id"], name: "index_favorites_on_user_id_and_prompt_id", unique: true
+    t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
   create_table "prompt_results", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -68,6 +89,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_000200) do
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_prompts_on_category_id"
     t.index ["forked_from_id"], name: "index_prompts_on_forked_from_id"
+    t.index ["title", "description", "content"], name: "index_prompts_on_searchable_content", type: :fulltext
     t.index ["updated_at"], name: "index_prompts_on_updated_at"
     t.index ["user_id"], name: "index_prompts_on_user_id"
     t.index ["visibility"], name: "index_prompts_on_visibility"
@@ -89,6 +111,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_000200) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "comments", "prompts"
+  add_foreign_key "comments", "users"
+  add_foreign_key "favorites", "prompts"
+  add_foreign_key "favorites", "users"
   add_foreign_key "prompt_results", "prompts"
   add_foreign_key "prompt_taggings", "prompts"
   add_foreign_key "prompt_taggings", "tags"

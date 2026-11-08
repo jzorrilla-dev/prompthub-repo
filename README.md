@@ -18,6 +18,11 @@ PromptHub es una biblioteca colaborativa para guardar, versionar y compartir pro
 - Búsqueda por texto, categoría y etiquetas.
 - Historial inmutable de versiones.
 - Forks privados para adaptar prompts públicos.
+- Favoritos personales para guardar prompts públicos.
+- Comentarios inline con edición del autor y moderación del dueño.
+- Búsqueda Full-Text y filtros por categoría, modelo, etiqueta y popularidad.
+- Comparación visual de versiones y restauración segura del historial.
+- Dashboard personal, perfiles públicos, estadísticas y actividad reciente.
 - Resultados de ejemplo asociados a cada prompt.
 - Interfaz responsive y copia al portapapeles.
 - Políticas explícitas de autorización para prompts y forks.
@@ -67,6 +72,28 @@ bin/rails zeitwerk:check
 ```
 
 La fase de base incluye también tests de políticas, paginación, privacidad y validaciones de dominio.
+
+## Producción con Docker
+
+La imagen de producción incluye Rails, Puma, Tailwind compilado y el cliente de MySQL. Para levantar el entorno:
+
+```bash
+cp .env.production.example .env.production
+# Edita .env.production y configura contraseñas y SECRET_KEY_BASE
+docker compose --env-file .env.production -f compose.production.yml up -d --build
+```
+
+La aplicación queda disponible en `http://localhost:3000` y expone el healthcheck en `/up`. El entrypoint ejecuta `db:prepare` antes de iniciar Puma.
+
+Para generar un backup comprimido de MySQL:
+
+```bash
+bin/backup
+```
+
+Los backups se guardan en `backups/`, que está excluido de Git. En producción real, configura una tarea programada que copie esos archivos a almacenamiento externo.
+
+El workflow de GitHub Actions ejecuta tests, Zeitwerk y la compilación de Tailwind en cada push a `main` y pull request.
 
 ## Modelo de datos
 

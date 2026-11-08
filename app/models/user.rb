@@ -3,6 +3,9 @@ class User < ApplicationRecord
 
   has_many :prompts, dependent: :destroy
   has_many :prompt_versions, dependent: :nullify
+  has_many :favorites, dependent: :destroy
+  has_many :favorite_prompts, through: :favorites, source: :prompt
+  has_many :comments, dependent: :destroy
 
   normalizes :email_address, with: ->(email) { email.strip.downcase }
 

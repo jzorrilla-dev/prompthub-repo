@@ -5,6 +5,11 @@ class PromptTest < ActiveSupport::TestCase
     assert_includes Prompt.search("Revisor"), prompts(:public_prompt)
   end
 
+  test "search filters by model and tag" do
+    assert_includes Prompt.where(ai_model: "GPT-5"), prompts(:public_prompt)
+    assert_includes Prompt.joins(:tags).where(tags: { name: "code" }), prompts(:public_prompt)
+  end
+
   test "snapshot records sequential versions" do
     prompt = prompts(:public_prompt)
     first = prompt.snapshot!
@@ -29,5 +34,18 @@ class PromptTest < ActiveSupport::TestCase
 
     refute prompt.valid?
     assert_includes prompt.errors[:forked_from], "no puede apuntar al mismo prompt"
+  end
+
+  test "restoring a version creates a new current version" do
+    prompt = prompts(:public_prompt)
+    first = prompt.snapshot!
+    prompt.update!(content: "Contenido posterior")
+    prompt.snapshot!
+
+    prompt.restore_from!(first, actor: prompt.user)
+
+    assert_equal "Revisa este código y presenta los problemas por prioridad.", prompt.reload.content
+    assert_equal 3, prompt.current_version.number
+    assert_equal "Restaurado desde v1", prompt.current_version.change_note
   end
 end

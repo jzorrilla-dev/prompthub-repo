@@ -4,16 +4,20 @@
   <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
     <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
       <div><p class="text-sm font-bold uppercase tracking-widest text-indigo-600"><%= params[:mine].present? ? "Tu espacio" : "Biblioteca abierta" %></p><h1 class="mt-2 text-4xl font-black tracking-tight"><%= params[:mine].present? ? "Mis prompts" : "Encuentra una mejor forma de pedirlo" %></h1></div>
-      <%= form_with url: prompts_path, method: :get, class: "flex w-full max-w-xl gap-2", data: { turbo_frame: "prompt_results" } do |form| %>
+      <%= form_with url: prompts_path, method: :get, class: "w-full max-w-3xl space-y-3", data: { turbo_frame: "prompt_results" } do |form| %>
         <%= form.hidden_field :mine, value: params[:mine] if params[:mine].present? %>
-        <%= form.search_field :q, value: params[:q], placeholder: "Busca por idea, etiqueta o contenido…", class: "form-input !mt-0" %>
-        <%= form.submit "Buscar", class: "btn-primary cursor-pointer" %>
+        <div class="flex gap-2"><%= form.label :q, "Buscar prompts", class: "sr-only" %><%= form.search_field :q, value: params[:q], placeholder: "Busca por idea, etiqueta o contenido…", class: "form-input !mt-0" %><%= form.submit "Buscar", class: "btn-primary cursor-pointer" %></div>
+        <div class="grid gap-2 sm:grid-cols-3">
+          <%= form.collection_select :category_id, @categories, :id, :name, { include_blank: "Todas las categorías", selected: params[:category_id] }, class: "form-input !mt-0 text-sm" %>
+          <%= form.select :model, options_for_select(@models, params[:model]), { include_blank: "Todos los modelos" }, class: "form-input !mt-0 text-sm" %>
+          <%= form.select :tag, options_for_select(@tags.map(&:name), params[:tag]), { include_blank: "Todas las etiquetas" }, class: "form-input !mt-0 text-sm" %>
+        </div>
       <% end %>
     </div>
     <div class="mt-7 flex flex-wrap gap-2">
-      <%= link_to "Todas", prompts_path(q: params[:q], mine: params[:mine]), class: "filter-pill #{'filter-pill-active' if params[:category_id].blank?}" %>
+      <%= link_to "Todas", prompts_path(prompt_explore_params(category_id: nil)), class: "filter-pill #{'filter-pill-active' if params[:category_id].blank?}" %>
       <% @categories.each do |category| %>
-        <%= link_to category.name, prompts_path(q: params[:q], mine: params[:mine], category_id: category.id), class: "filter-pill #{'filter-pill-active' if params[:category_id].to_s == category.id.to_s}" %>
+        <%= link_to category.name, prompts_path(prompt_explore_params(category_id: category.id)), class: "filter-pill #{'filter-pill-active' if params[:category_id].to_s == category.id.to_s}" %>
       <% end %>
     </div>
   </div>
@@ -22,7 +26,7 @@
 <%= turbo_frame_tag "prompt_results", target: "_top", data: { turbo_action: "advance" } do %>
   <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
     <% if @prompts.any? %>
-      <div class="mb-5 flex items-center justify-between"><p class="text-sm text-slate-500"><strong class="text-slate-950"><%= @total_prompts %></strong> resultados</p><%= link_to "+ Nuevo prompt", new_prompt_path, class: "text-sm font-bold text-indigo-700", data: { turbo_frame: "_top" } if authenticated? %></div>
+      <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><p class="text-sm text-slate-500"><strong class="text-slate-950"><%= @total_prompts %></strong> resultados</p><div class="flex items-center gap-4"><%= link_to "+ Nuevo prompt", new_prompt_path, class: "text-sm font-bold text-indigo-700", data: { turbo_frame: "_top" } if authenticated? %><%= form_with url: prompts_path, method: :get, class: "flex items-center gap-2", data: { turbo_frame: "prompt_results" } do |form| %><% prompt_explore_params.except(:sort).each do |key, value| %><%= hidden_field_tag key, value %><% end %><%= form.select :sort, options_for_select([["Más recientes", "recent"], ["Más populares", "popular"]], @sort), {}, class: "rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700" %><%= form.submit "Ordenar", class: "sr-only" %><% end %></div></div>
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"><%= render partial: "shared/prompt_card", collection: @prompts, as: :prompt %></div>
       <%= render "shared/pagination" %>
     <% else %>

@@ -6,23 +6,30 @@ class PromptsController < ApplicationController
   before_action :authorize_fork!, only: :fork
 
   def index
-    scope = Prompt.includes(:user, :category, :tags).search(params[:q])
-    scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
-    scope = if params[:mine].present? && authenticated?
-      scope.where(user: current_user).recent
+    visibility_scope = if params[:mine].present? && authenticated?
+      Prompt.where(user: current_user)
     else
-      scope.published.recent
+      Prompt.published
     end
+    scope = visibility_scope.includes(:user, :category, :tags).search(params[:q])
+    scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
+    scope = scope.where(ai_model: params[:model]) if params[:model].present?
+    scope = scope.joins(:tags).where(tags: { name: params[:tag] }).distinct if params[:tag].present?
+    @sort = %w[recent popular].include?(params[:sort]) ? params[:sort] : "recent"
     @page = [params[:page].to_i, 1].max
     @per_page = 9
-    @total_prompts = scope.count
+    @total_prompts = scope.distinct.count(:id)
     @total_pages = (@total_prompts.to_f / @per_page).ceil
-    @prompts = scope.paginate(page: @page, per_page: @per_page)
+    @prompts = (@sort == "popular" ? scope.popular : scope.recent).paginate(page: @page, per_page: @per_page)
     @categories = Category.order(:name)
+    @models = visibility_scope.where.not(ai_model: nil).distinct.order(:ai_model).pluck(:ai_model)
+    @tags = Tag.joins(:prompts).merge(visibility_scope).distinct.order(:name).limit(40)
   end
 
   def show
     @versions = @prompt.prompt_versions.limit(10)
+    @comments = @prompt.comments.includes(:user).recent
+    @comment = @prompt.comments.new
   end
 
   def new

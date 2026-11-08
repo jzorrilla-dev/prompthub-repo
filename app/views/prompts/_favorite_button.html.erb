@@ -1,0 +1,11 @@
+<div id="<%= dom_id(prompt, :favorite) %>" class="flex items-center gap-2">
+  <% if favorited %>
+    <%= button_to prompt_favorite_path(prompt), method: :delete, data: { turbo_stream: true }, class: "rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-800 hover:bg-amber-100" do %>
+      ★ Guardado <span class="ml-1 text-xs font-medium">(<%= prompt.favorites.count %>)</span>
+    <% end %>
+  <% else %>
+    <%= button_to prompt_favorite_path(prompt), method: :post, data: { turbo_stream: true }, class: "rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-800" do %>
+      ☆ Guardar <span class="ml-1 text-xs font-medium">(<%= prompt.favorites.count %>)</span>
+    <% end %>
+  <% end %>
+</div>

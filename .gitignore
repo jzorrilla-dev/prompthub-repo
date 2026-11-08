@@ -8,10 +8,17 @@
 !/log/.keep
 !/tmp/.keep
 !/tmp/pids
+!/tmp/pids/
+/tmp/pids/*
 !/tmp/pids/.keep
 /storage/*
 !/storage/.keep
+/backups/*
+!/backups/.keep
 /public/assets
 /app/assets/builds/*
 !/app/assets/builds/.keep
 .env
+.env.*
+!.env.example
+!.env.production.example

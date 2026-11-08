@@ -14,4 +14,15 @@ module ApplicationHelper
   def pagination_path(page)
     url_for(request.query_parameters.merge(page: page))
   end
+
+  def prompt_explore_params(overrides = {})
+    {
+      q: params[:q],
+      mine: params[:mine],
+      category_id: params[:category_id],
+      model: params[:model],
+      tag: params[:tag],
+      sort: params[:sort]
+    }.merge(overrides).compact
+  end
 end

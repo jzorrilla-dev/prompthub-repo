@@ -22,7 +22,10 @@
         <div class="flex items-center gap-2 sm:gap-3">
           <%= link_to "Explorar", prompts_path, class: "hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white hover:text-slate-950 sm:block" %>
           <% if authenticated? %>
+            <%= link_to "Panel", dashboard_path, class: "hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white hover:text-slate-950 md:block" %>
             <%= link_to "Mis prompts", prompts_path(mine: 1), class: "hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white hover:text-slate-950 md:block" %>
+            <%= link_to "Favoritos", favorites_path, class: "hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white hover:text-slate-950 md:block" %>
+            <%= link_to initials(current_user.name), user_path(current_user), title: "Ver mi perfil", aria: { label: "Ver mi perfil" }, class: "grid size-9 place-items-center rounded-full bg-amber-100 text-xs font-black text-amber-800 hover:ring-4 hover:ring-amber-100" %>
             <%= link_to "+ Nuevo prompt", new_prompt_path, class: "rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-indigo-700" %>
             <%= button_to "Salir", session_path, method: :delete, class: "hidden px-2 py-2 text-sm font-semibold text-slate-500 hover:text-slate-950 sm:block" %>
           <% else %>

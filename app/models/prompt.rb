@@ -9,6 +9,9 @@ class Prompt < ApplicationRecord
   has_many :prompt_results, dependent: :destroy
   has_many :prompt_taggings, dependent: :destroy
   has_many :tags, through: :prompt_taggings
+  has_many :favorites, dependent: :destroy
+  has_many :favorited_by_users, through: :favorites, source: :user
+  has_many :comments, dependent: :destroy
 
   accepts_nested_attributes_for :prompt_results, reject_if: :all_blank, allow_destroy: true
 
@@ -20,12 +23,18 @@ class Prompt < ApplicationRecord
 
   scope :published, -> { public_prompt }
   scope :recent, -> { order(updated_at: :desc) }
+  scope :popular, -> { left_joins(:favorites).group("prompts.id").order(Arel.sql("COUNT(favorites.id) DESC, prompts.updated_at DESC")) }
+  scope :favorited_by, ->(user) { joins(:favorites).where(favorites: { user_id: user.id }) }
   scope :search, lambda { |query|
     return all if query.blank?
 
+    terms = query.to_s.scan(/[[:alnum:]]+/)
+    return all if terms.empty?
+
+    boolean_query = terms.map { |term| "+#{term}*" }.join(" ")
     escaped = sanitize_sql_like(query.strip)
     left_joins(:tags, :category)
-      .where("prompts.title LIKE :q OR prompts.description LIKE :q OR prompts.content LIKE :q OR tags.name LIKE :q OR categories.name LIKE :q", q: "%#{escaped}%")
+      .where("(MATCH(prompts.title, prompts.description, prompts.content) AGAINST (:boolean_query IN BOOLEAN MODE) OR tags.name LIKE :q OR categories.name LIKE :q)", boolean_query: boolean_query, q: "%#{escaped}%")
       .distinct
   }
 
@@ -50,6 +59,25 @@ class Prompt < ApplicationRecord
       ai_model: ai_model,
       change_note: change_note.presence
     )
+  end
+
+  def current_version
+    prompt_versions.first
+  end
+
+  def restore_from!(version, actor: user)
+    raise ArgumentError, "La versión no pertenece a este prompt" unless version.prompt_id == id
+
+    transaction do
+      update!(
+        title: version.title,
+        description: version.description,
+        content: version.content,
+        ai_model: version.ai_model
+      )
+      self.change_note = "Restaurado desde v#{version.number}"
+      snapshot!(actor: actor)
+    end
   end
 
   attr_accessor :change_note

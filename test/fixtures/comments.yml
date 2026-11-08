@@ -1,0 +1,9 @@
+ada_comment:
+  user: ada
+  prompt: public_prompt
+  body: Este prompt funciona muy bien cuando el contexto está claramente delimitado.
+
+grace_comment:
+  user: grace
+  prompt: public_prompt
+  body: Lo probé con otro modelo y también produjo un resultado consistente.
